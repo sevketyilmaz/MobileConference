@@ -1,14 +1,19 @@
 package endpoints.backend.domain;
 
+import com.googlecode.objectify.annotation.Entity;
+import com.googlecode.objectify.annotation.Id;
+
 import endpoints.backend.form.ProfileForm.TeeShirtSize;
 
-// TODO indicate that this class is an Entity
+// indicate that this class is an Entity
+@Entity
 public class Profile {
     String displayName;
     String mainEmail;
     TeeShirtSize teeShirtSize;
 
-    // TODO indicate that the userId is to be used in the Entity's key
+    // indicate that the userId is to be used in the Entity's key
+    @Id
     String userId;
 
     /** Just making the default constructor private. */
@@ -44,4 +49,13 @@ public class Profile {
         return userId;
     }
 
+    /**
+     * Update the Profile with given displayName and teeShirtSize
+     * @param displayName
+     * @param teeShirtSize
+     */
+    public void update(String displayName, TeeShirtSize teeShirtSize) {
+        if(displayName != null) this.displayName = displayName;
+        if(teeShirtSize != null) this.teeShirtSize = teeShirtSize;
+    }
 }

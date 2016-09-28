@@ -6,13 +6,9 @@ import com.googlecode.objectify.ObjectifyService;
 
 import endpoints.backend.domain.Profile;
 
-/**
- * Custom Objectify Service that this application should use.
- */
+/** Custom Objectify Service that this application should use. */
 public class OfyService {
-    /**
-     * This static block ensure the entity registration.
-     */
+    /** This static block ensure the entity registration. */
     static {
         factory().register(Profile.class);
     }
