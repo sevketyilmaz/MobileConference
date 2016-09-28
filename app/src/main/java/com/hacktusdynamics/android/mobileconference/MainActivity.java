@@ -1,5 +1,6 @@
 package com.hacktusdynamics.android.mobileconference;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -12,6 +13,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -80,18 +82,14 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camera) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
-
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
+        if (id == R.id.nav_home) {
+            Toast.makeText(this, "Home !", Toast.LENGTH_SHORT).show();
+        } else if (id == R.id.nav_show_conferences) {
+            startActivity(new Intent(this, ShowConferencesActivity.class));
+        } else if (id == R.id.nav_create_conferences) {
+            startActivity(new Intent(this, CreateConferencesActivity.class));
+        } else if (id == R.id.nav_my_profile) {
+            startActivity(new Intent(this, MyProfileActivity.class));
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

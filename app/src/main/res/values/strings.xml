@@ -5,4 +5,7 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
     <string name="action_settings">Settings</string>
+    <string name="title_activity_show_conferences">Show Conferences</string>
+    <string name="title_activity_my_profile">My Profile</string>
+    <string name="title_activity_create_conferences">Create Conferences</string>
 </resources>
