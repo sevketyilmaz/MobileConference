@@ -4,6 +4,7 @@ import com.googlecode.objectify.Objectify;
 import com.googlecode.objectify.ObjectifyFactory;
 import com.googlecode.objectify.ObjectifyService;
 
+import endpoints.backend.domain.Conference;
 import endpoints.backend.domain.Profile;
 
 /** Custom Objectify Service that this application should use. */
@@ -11,6 +12,7 @@ public class OfyService {
     /** This static block ensure the entity registration. */
     static {
         factory().register(Profile.class);
+        factory().register(Conference.class);
     }
 
     /**
