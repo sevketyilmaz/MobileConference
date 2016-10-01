@@ -8,10 +8,13 @@ import com.google.appengine.api.users.User;
 import com.googlecode.objectify.Key;
 
 import endpoints.backend.Constants;
+import endpoints.backend.domain.Conference;
 import endpoints.backend.domain.Profile;
+import endpoints.backend.form.ConferenceForm;
 import endpoints.backend.form.ProfileForm;
 import endpoints.backend.form.ProfileForm.TeeShirtSize;
 
+import static endpoints.backend.service.OfyService.factory;
 import static endpoints.backend.service.OfyService.ofy;
 
 /**
@@ -99,4 +102,72 @@ public class ConferenceApi {
         Profile profile = (Profile) ofy().load().key(key).now();
         return profile;
     }
+
+    /**
+     * Creates a new Conference object and stores it in the datastore
+     *
+     * @param user An user who invokes this method, null when the user is not signed in.
+     * @param conferenceForm A ConferenceForm object representing user's input.
+     * @return A newly created Conference object.
+     * @throws UnauthorizedException when the user is not signed in.
+     */
+    @ApiMethod(name = "createConference", path = "conference", httpMethod = HttpMethod.POST)
+    public Conference createConference(final User user, final ConferenceForm conferenceForm)
+            throws UnauthorizedException{
+        if(user == null){
+            throw new UnauthorizedException("Authorization Required!");
+        }
+
+        // (Lesson 4)
+        // Get the userId of the logged in User
+        String userId = user.getUserId();
+
+        // (Lesson 4)
+        // Get the key for the User's Profile
+        Key<Profile> profileKey = Key.create(Profile.class, userId);
+
+        // (Lesson 4)
+        // Allocate a key for the conference -- let App Engine allocate the ID
+        // Dont forget the include parent Profile in the allocated ID
+        final Key<Conference> conferenceKey = factory().allocateId(profileKey, Conference.class);
+
+        // (Lesson 4)
+        // Get the Conference Id from the Key
+        final long conferenceId = conferenceKey.getId();
+
+        // (Lesson 4)
+        // Get the existing Profile entity for the current user if there is one
+        // otherwise create a new Profile entity with the default values
+        Profile profile= getProfileFromUser(user);
+
+        // (Lesson 4)
+        // Create a new Conference Entity, specifying the user's profile entity
+        // as the parent of the conference
+        Conference conference = new Conference(conferenceId, userId, conferenceForm);
+
+        // (Lesson 4)
+        // Save Conference and Profile entities
+        ofy().save().entities(conference, profile).now();
+
+        return conference;
+    }
+
+    /**
+     * Gets the Profile Entity for the current user or creates if its doesnt exist
+     *
+     * @param user
+     * @return user's profile
+     */
+    private static Profile getProfileFromUser(User user) {
+        // First fetch the user's Profile from Datastore
+        Profile profile = ofy().load().key(Key.create(Profile.class, user.getUserId())).now();
+        if(profile == null){ //create new profile with default values
+            String email = user.getEmail();
+            profile = new Profile(user.getUserId(),
+                        extractDefaultDisplayNameFromEmail(email),
+                        email, TeeShirtSize.NOT_SPECIFIED);
+        }
+        return profile;
+    }
+
 }
