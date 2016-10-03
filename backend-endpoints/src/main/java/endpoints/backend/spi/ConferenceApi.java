@@ -6,8 +6,10 @@ import com.google.api.server.spi.config.ApiMethod.HttpMethod;
 import com.google.api.server.spi.response.UnauthorizedException;
 import com.google.appengine.api.users.User;
 import com.googlecode.objectify.Key;
+import com.googlecode.objectify.Objectify;
 
 import endpoints.backend.Constants;
+import endpoints.backend.domain.AppEngineUser;
 import endpoints.backend.domain.Conference;
 import endpoints.backend.domain.Profile;
 import endpoints.backend.form.ConferenceForm;
@@ -60,7 +62,7 @@ public class ConferenceApi {
 
         // 2 Get the userId and mainEmail
         String mainEmail = user.getEmail();
-        String userId = user.getUserId();
+        String userId = getUserId(user);
         // Get displayname and teeshrit size sent by the request
         String displayName = profileForm.getDisplayName();
         TeeShirtSize teeShirtSize = profileForm.getTeeShirtSize();
@@ -97,7 +99,7 @@ public class ConferenceApi {
         }
 
         // load the Profile Entity
-        String userId = user.getUserId();
+        String userId = getUserId(user);
         Key key = Key.create(Profile.class, userId);
         Profile profile = (Profile) ofy().load().key(key).now();
         return profile;
@@ -120,7 +122,7 @@ public class ConferenceApi {
 
         // (Lesson 4)
         // Get the userId of the logged in User
-        String userId = user.getUserId();
+        String userId = getUserId(user);
 
         // (Lesson 4)
         // Get the key for the User's Profile
@@ -160,14 +162,34 @@ public class ConferenceApi {
      */
     private static Profile getProfileFromUser(User user) {
         // First fetch the user's Profile from Datastore
-        Profile profile = ofy().load().key(Key.create(Profile.class, user.getUserId())).now();
+        Profile profile = ofy().load().key(Key.create(Profile.class, getUserId(user))).now();
         if(profile == null){ //create new profile with default values
             String email = user.getEmail();
-            profile = new Profile(user.getUserId(),
+            profile = new Profile(getUserId(user),
                         extractDefaultDisplayNameFromEmail(email),
                         email, TeeShirtSize.NOT_SPECIFIED);
         }
         return profile;
     }
 
+    /**
+     * This is a ugly workaround for null userId for Android clients,
+     * look AppEngineUser class for more explanation
+     *
+     * @param user A User object injected by the cloud endpoints
+     * @return the App Engine userId for the user.
+     */
+    private static String getUserId(User user){
+        String userId = user.getUserId();
+        if(userId == null){//userId is null, so trying to obtain it from the datastore
+            AppEngineUser appEngineUser = new AppEngineUser(user);
+            ofy().save().entity(appEngineUser).now();
+            // Begin new session for not using session cache
+            Objectify objectify = ofy().factory().begin();
+            AppEngineUser savedUser = objectify.load().key(appEngineUser.getKey()).now();
+            userId = savedUser.getUser().getUserId();
+        }
+
+        return userId;
+    }
 }
