@@ -23,7 +23,7 @@ import static endpoints.backend.service.OfyService.ofy;
 @Api(name = "conference",
     version = "v1",
     scopes = {Constants.EMAIL_SCOPE},
-    clientIds = {Constants.WEB_CLIENT_ID, Constants.API_EXPLORER_CLIENT_ID },
+    clientIds = {Constants.WEB_CLIENT_ID, Constants.ANDROID_CLIENT_ID, Constants.API_EXPLORER_CLIENT_ID },
     description = "API for the Conference Central Backend application.")
 public class ConferenceApi {
 
