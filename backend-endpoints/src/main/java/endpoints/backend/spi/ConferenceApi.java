@@ -7,6 +7,9 @@ import com.google.api.server.spi.response.UnauthorizedException;
 import com.google.appengine.api.users.User;
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.Objectify;
+import com.googlecode.objectify.cmd.Query;
+
+import java.util.List;
 
 import endpoints.backend.Constants;
 import endpoints.backend.domain.AppEngineUser;
@@ -192,4 +195,22 @@ public class ConferenceApi {
 
         return userId;
     }
+
+    /**
+     * Queries againts the datastore with the given filters and returns the result.
+     *
+     * Normally this kind of method suppose to get invoke by a GET HTTP method,
+     * but we do it with POST, in order to receive conferenceQuerryForm Object via the POST
+     *
+     * @param conferenceQueryForm A form object representing the query
+     * @return A list of conferences that match the query.
+     */
+    @ApiMethod(name = "queryConferences", path = "queryConferences", httpMethod = HttpMethod.POST)
+    public List<Conference> queryConferences(){
+        // Find all entities of type Conference
+        Query query = ofy().load().type(Conference.class).order("name");
+        return query.list();
+    }
+
+
 }
